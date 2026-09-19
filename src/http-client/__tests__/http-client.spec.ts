@@ -26,7 +26,11 @@ import {
   mineTurRegionsFixture,
   mineTurStationsResponseFixture,
 } from './http-client.fixture';
-import { expectFetchCallWithUrlAndHeaders, mockFetchFailure, mockFetchSuccess } from './http-client.spec-util';
+import {
+  expectFetchCallWithUrlAndHeaders,
+  mockFetchFailure,
+  mockFetchSuccess,
+} from './http-client.spec-util';
 
 describe('MineTurHttpClient', () => {
   let httpClient: MineTurHttpClient;
