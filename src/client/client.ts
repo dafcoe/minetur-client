@@ -2,18 +2,23 @@ import { MineTurHttpClient } from '../http-client';
 import {
   mapDistrictFiltersToMineTurDistrictFilters,
   mapMineTurDistrictsToDistricts,
+  mapMineTurMunicipalitiesToMunicipalities,
   mapMineTurRegionsToRegions,
+  mapMunicipalityFiltersToMineTurMunicipalityFilters,
 } from './client.mapper';
 import {
   District,
   DistrictFilters,
   FetchOptions,
+  Municipality,
+  MunicipalityFilters,
   Region,
 } from './client.type';
 
 export class MineTurClient {
   private regionsPromise: Promise<Region[]> | null = null;
   private districtsPromises = new Map<string | 'ALL', Promise<District[]>>();
+  private municipalitiesPromises = new Map<string | 'ALL', Promise<Municipality[]>>();
 
   constructor(
     private readonly httpClient: MineTurHttpClient = new MineTurHttpClient(),
@@ -101,6 +106,33 @@ export class MineTurClient {
         return this.httpClient.getDistricts(mineTurFilters);
       },
       mapMineTurDistrictsToDistricts,
+      options,
+    );
+  }
+
+  /**
+   * Fetches municipalities, optionally filtered by district ID.
+   * Results are cached in memory. Use `forceRefresh: true` to bypass cache.
+   */
+  async getMunicipalities(
+    filters: MunicipalityFilters = {},
+    options?: FetchOptions,
+  ): Promise<Municipality[]> {
+    const cacheKey = filters.districtId ?? 'ALL';
+    const currentPromise = this.municipalitiesPromises.get(cacheKey) ?? null;
+
+    return this.fetchAndCache(
+      'municipalities',
+      currentPromise,
+      (promise) => {
+        if (promise) this.municipalitiesPromises.set(cacheKey, promise);
+        else this.municipalitiesPromises.delete(cacheKey);
+      },
+      () => {
+        const mineTurFilters = mapMunicipalityFiltersToMineTurMunicipalityFilters(filters);
+        return this.httpClient.getMunicipalities(mineTurFilters);
+      },
+      mapMineTurMunicipalitiesToMunicipalities,
       options,
     );
   }

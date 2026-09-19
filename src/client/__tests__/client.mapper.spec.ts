@@ -1,6 +1,8 @@
 import {
   mineTurDistrictMadridFixture,
   mineTurDistrictsFixture,
+  mineTurMunicipalitiesFixture,
+  mineTurMunicipalityMadridFixture,
   mineTurRegionAndaluciaFixture,
   mineTurRegionsFixture,
 } from '../../http-client/__tests__/http-client.fixture';
@@ -8,12 +10,17 @@ import {
   mapDistrictFiltersToMineTurDistrictFilters,
   mapMineTurDistrictsToDistricts,
   mapMineTurDistrictToDistrict,
+  mapMineTurMunicipalitiesToMunicipalities,
+  mapMineTurMunicipalityToMunicipality,
   mapMineTurRegionsToRegions,
   mapMineTurRegionToRegion,
+  mapMunicipalityFiltersToMineTurMunicipalityFilters,
 } from '../client.mapper';
 import {
   districtMadridFixture,
   districtsFixture,
+  municipalitiesFixture,
+  municipalityMadridFixture,
   regionAndaluciaFixture,
   regionsFixture,
 } from './client.fixture';
@@ -71,6 +78,32 @@ describe('client.mapper', () => {
     });
   });
 
+  describe('municipalities', () => {
+    it('should correctly map a single MineTurMunicipality to Municipality', () => {
+      // Act
+      const municipality = mapMineTurMunicipalityToMunicipality(mineTurMunicipalityMadridFixture);
+
+      // Assert
+      expect(municipality).toEqual(municipalityMadridFixture);
+    });
+
+    it('should correctly map an array of MineTurMunicipalities to Municipalities', () => {
+      // Act
+      const municipalities = mapMineTurMunicipalitiesToMunicipalities(mineTurMunicipalitiesFixture);
+
+      // Assert
+      expect(municipalities).toEqual(municipalitiesFixture);
+    });
+
+    it('should return an empty array when mapping an empty array of municipalities', () => {
+      // Act
+      const municipalities = mapMineTurMunicipalitiesToMunicipalities([]);
+
+      // Assert
+      expect(municipalities).toEqual([]);
+    });
+  });
+
   describe('filters', () => {
     describe('mapDistrictFiltersToMineTurDistrictFilters', () => {
       it('should map regionId when provided', () => {
@@ -89,6 +122,29 @@ describe('client.mapper', () => {
       it('should return an empty object when regionId is not provided', () => {
         // Act
         const filters = mapDistrictFiltersToMineTurDistrictFilters({});
+
+        // Assert
+        expect(filters).toEqual({});
+      });
+    });
+
+    describe('mapMunicipalityFiltersToMineTurMunicipalityFilters', () => {
+      it('should map districtId when provided', () => {
+        // Assemble
+        const districtId = '28';
+        const filters = { districtId };
+        const expectedFilters = { IDPovincia: districtId };
+
+        // Act
+        const mineTurFilters = mapMunicipalityFiltersToMineTurMunicipalityFilters(filters);
+
+        // Assert
+        expect(mineTurFilters).toEqual(expectedFilters);
+      });
+
+      it('should return an empty object when districtId is not provided', () => {
+        // Act
+        const filters = mapMunicipalityFiltersToMineTurMunicipalityFilters({});
 
         // Assert
         expect(filters).toEqual({});

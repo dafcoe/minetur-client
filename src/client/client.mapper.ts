@@ -1,11 +1,15 @@
 import {
   MineTurDistrict,
   MineTurDistrictFilters,
+  MineTurMunicipality,
+  MineTurMunicipalityFilters,
   MineTurRegion,
 } from '../http-client';
 import {
   District,
   DistrictFilters,
+  Municipality,
+  MunicipalityFilters,
   Region,
 } from './client.type';
 
@@ -38,6 +42,33 @@ export function mapDistrictFiltersToMineTurDistrictFilters(
   const filters: MineTurDistrictFilters = {};
 
   if (districtFilters.regionId) filters.IDCCAA = districtFilters.regionId;
+
+  return filters;
+}
+
+export function mapMineTurMunicipalityToMunicipality(
+  mineTurMunicipality: MineTurMunicipality,
+): Municipality {
+  return {
+    id: mineTurMunicipality.IDMunicipio,
+    idDistrict: mineTurMunicipality.IDPovincia,
+    idRegion: mineTurMunicipality.IDCCAA,
+    name: mineTurMunicipality.Municipio,
+  };
+}
+
+export function mapMineTurMunicipalitiesToMunicipalities(
+  mineTurMunicipalities: MineTurMunicipality[],
+): Municipality[] {
+  return mineTurMunicipalities.map(mapMineTurMunicipalityToMunicipality);
+}
+
+export function mapMunicipalityFiltersToMineTurMunicipalityFilters(
+  municipalityFilters: MunicipalityFilters,
+): MineTurMunicipalityFilters {
+  const filters: MineTurMunicipalityFilters = {};
+
+  if (municipalityFilters.districtId) filters.IDPovincia = municipalityFilters.districtId;
 
   return filters;
 }

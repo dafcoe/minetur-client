@@ -1,10 +1,12 @@
-import { MineTurClient } from './client/client';
+import { MineTurClient } from './client';
 
 async function run() {
   const client = new MineTurClient();
 
   const regions = await client.getRegions();
   console.log(`${regions.length} regions found:`, regions);
+
+  console.log('\n');
 
   const districts = await client.getDistricts();
   console.log(`${districts.length} districts found:`, districts);
@@ -16,16 +18,16 @@ async function run() {
 
   console.log('\n');
 
-//   const municipalities = await client.getMunicipalities();
-//   console.log(`${municipalities.length} municipalities found:`, municipalities);
-//
-//   console.log('\n');
-//
-//   const faroMunicipalities = await client.getMunicipalities({ districtId: 8 });
-//   console.log(`${faroMunicipalities.length} municipalities found in Faro:`, faroMunicipalities);
-//
-//   console.log('\n');
-//
+  const municipalities = await client.getMunicipalities();
+  console.log(`${municipalities.length} municipalities found:`, municipalities);
+
+  console.log('\n');
+
+  const sevillaMunicipalities = await client.getMunicipalities({ districtId: '41' });
+  console.log(`${sevillaMunicipalities.length} municipalities found in Sevilla:`, sevillaMunicipalities);
+
+  console.log('\n');
+
 //   const brands = await client.getBrands();
 //   console.log(`${brands.length} brands found:`, brands);
 //

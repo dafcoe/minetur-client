@@ -1,13 +1,24 @@
 import { Mocked, MockInstance } from 'vitest';
-import { MineTurDistrict, MineTurHttpClient, MineTurRegion } from '../../http-client';
+import {
+  MineTurDistrict,
+  MineTurHttpClient,
+  MineTurMunicipality,
+  MineTurRegion,
+} from '../../http-client';
 import { MineTurClient } from '../client';
 import {
   mapDistrictFiltersToMineTurDistrictFilters,
   mapMineTurDistrictsToDistricts,
+  mapMineTurMunicipalitiesToMunicipalities,
   mapMineTurRegionsToRegions,
+  mapMunicipalityFiltersToMineTurMunicipalityFilters,
 } from '../client.mapper';
-import { DistrictFilters } from '../client.type';
-import { districtsFixture, regionsFixture } from './client.fixture';
+import { DistrictFilters, MunicipalityFilters } from '../client.type';
+import {
+  districtsFixture,
+  municipalitiesFixture,
+  regionsFixture,
+} from './client.fixture';
 import {
   createError,
   createHttpClientMock,
@@ -18,6 +29,8 @@ vi.mock('../client.mapper', () => ({
   mapMineTurRegionsToRegions: vi.fn(),
   mapMineTurDistrictsToDistricts: vi.fn(),
   mapDistrictFiltersToMineTurDistrictFilters: vi.fn(),
+  mapMineTurMunicipalitiesToMunicipalities: vi.fn(),
+  mapMunicipalityFiltersToMineTurMunicipalityFilters: vi.fn(),
 }));
 
 describe('MineTurClient', () => {
@@ -250,6 +263,132 @@ describe('MineTurClient', () => {
       expect(httpClientMock.getDistricts).toHaveBeenCalledTimes(2);
       expect(firstCall).toEqual([]);
       expect(secondCall).toEqual(districtsFixture);
+    });
+  });
+
+  describe('getMunicipalities', () => {
+    it('should return an array of municipalities when the http-client request succeeds and provides outcome (without filters)', async () => {
+      // Assemble
+      const mineTurMunicipalities = [{ IDMunicipio: '4354', Municipio: 'Madrid' }] as MineTurMunicipality[];
+      httpClientMock.getMunicipalities.mockResolvedValueOnce(mineTurMunicipalities);
+
+      // Act
+      const municipalities = await client.getMunicipalities();
+
+      // Assert
+      expect(httpClientMock.getMunicipalities).toHaveBeenCalledTimes(1);
+      expect(httpClientMock.getMunicipalities).toHaveBeenCalledWith({});
+      expect(mapMineTurMunicipalitiesToMunicipalities).toHaveBeenCalledWith(mineTurMunicipalities);
+      expect(municipalities).toEqual(municipalitiesFixture);
+    });
+
+    it('should return an array of municipalities when the http-client request succeeds and provides outcome (with filters)', async () => {
+      // Assemble
+      const filters: MunicipalityFilters = { districtId: '28' };
+      const expectedMineTurFilters = { IDPovincia: '28' };
+      const mineTurMunicipalities = [{ IDMunicipio: '4354', Municipio: 'Madrid' }] as MineTurMunicipality[];
+
+      vi.mocked(mapMunicipalityFiltersToMineTurMunicipalityFilters).mockReturnValueOnce(expectedMineTurFilters);
+      httpClientMock.getMunicipalities.mockResolvedValueOnce(mineTurMunicipalities);
+
+      // Act
+      const municipalities = await client.getMunicipalities(filters);
+
+      // Assert
+      expect(mapMunicipalityFiltersToMineTurMunicipalityFilters).toHaveBeenCalledWith(filters);
+      expect(httpClientMock.getMunicipalities).toHaveBeenCalledTimes(1);
+      expect(httpClientMock.getMunicipalities).toHaveBeenCalledWith(expectedMineTurFilters);
+      expect(mapMineTurMunicipalitiesToMunicipalities).toHaveBeenCalledWith(mineTurMunicipalities);
+      expect(municipalities).toEqual(municipalitiesFixture);
+    });
+
+    it('should return an empty array and log an error when the http-client request fails', async () => {
+      // Assemble
+      httpClientMock.getMunicipalities.mockRejectedValueOnce(createError());
+
+      // Act
+      const municipalities = await client.getMunicipalities();
+
+      // Assert
+      expect(httpClientMock.getMunicipalities).toHaveBeenCalledTimes(1);
+      expect(municipalities).toEqual([]);
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to fetch municipalities (Network error)');
+    });
+
+    it('should cache municipalities and avoid subsequent network calls (without filters)', async () => {
+      // Assemble
+      const mineTurMunicipalities = [{ IDMunicipio: '4354', Municipio: 'Madrid' }] as MineTurMunicipality[];
+      httpClientMock.getMunicipalities.mockResolvedValueOnce(mineTurMunicipalities);
+
+      // Act
+      const firstCall = await client.getMunicipalities();
+      const secondCall = await client.getMunicipalities();
+
+      // Assert
+      expect(httpClientMock.getMunicipalities).toHaveBeenCalledTimes(1);
+      expect(firstCall).toEqual(municipalitiesFixture);
+      expect(secondCall).toEqual(municipalitiesFixture);
+    });
+
+    it('should cache municipalities separately for different district filters', async () => {
+      // Assemble
+      const mineTurMunicipalities = [{ IDMunicipio: '4354', Municipio: 'Madrid' }] as MineTurMunicipality[];
+      httpClientMock.getMunicipalities.mockResolvedValue(mineTurMunicipalities);
+
+      // Act
+      await client.getMunicipalities({ districtId: '28' });
+      await client.getMunicipalities({ districtId: '28' });
+      await client.getMunicipalities({ districtId: '41' });
+
+      // Assert
+      expect(httpClientMock.getMunicipalities).toHaveBeenCalledTimes(2);
+    });
+
+    it('should share the in-flight promise across concurrent calls', async () => {
+      // Assemble
+      const mineTurMunicipalities = [{ IDMunicipio: '4354', Municipio: 'Madrid' }] as MineTurMunicipality[];
+      httpClientMock.getMunicipalities.mockResolvedValueOnce(mineTurMunicipalities);
+
+      // Act
+      const [firstCall, secondCall] = await Promise.all([
+        client.getMunicipalities(),
+        client.getMunicipalities(),
+      ]);
+
+      // Assert
+      expect(httpClientMock.getMunicipalities).toHaveBeenCalledTimes(1);
+      expect(firstCall).toEqual(municipalitiesFixture);
+      expect(secondCall).toEqual(municipalitiesFixture);
+    });
+
+    it('should bypass cache when forceRefresh is true', async () => {
+      // Assemble
+      const mineTurMunicipalities = [{ IDMunicipio: '4354', Municipio: 'Madrid' }] as MineTurMunicipality[];
+      httpClientMock.getMunicipalities.mockResolvedValue(mineTurMunicipalities);
+
+      // Act
+      await client.getMunicipalities();
+      await client.getMunicipalities({}, { forceRefresh: true });
+
+      // Assert
+      expect(httpClientMock.getMunicipalities).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not cache when the request fails, allowing subsequent retry', async () => {
+      // Assemble
+      const mineTurMunicipalities = [{ IDMunicipio: '4354', Municipio: 'Madrid' }] as MineTurMunicipality[];
+      httpClientMock.getMunicipalities
+        .mockRejectedValueOnce(createError())
+        .mockResolvedValueOnce(mineTurMunicipalities);
+
+      // Act
+      const firstCall = await client.getMunicipalities();
+      const secondCall = await client.getMunicipalities();
+
+      // Assert
+      expect(httpClientMock.getMunicipalities).toHaveBeenCalledTimes(2);
+      expect(firstCall).toEqual([]);
+      expect(secondCall).toEqual(municipalitiesFixture);
     });
   });
 });

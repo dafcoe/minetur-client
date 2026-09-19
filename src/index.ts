@@ -1,14 +1,8 @@
-// export { DGEGClient } from './client';
-// export type {
-//   Brand,
-//   CacheResource,
-//   District,
-//   FetchOptions,
-//   Fuel,
-//   Municipality,
-//   MunicipalityFilters,
-//   Station,
-//   StationFilters,
-//   StationFuel,
-//   StationType,
-// } from './client';
+export { MineTurClient } from './client';
+export type {
+  Region,
+  District,
+  FetchOptions,
+  Municipality,
+  MunicipalityFilters,
+} from './client';
