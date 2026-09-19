@@ -1,6 +1,7 @@
 import { Mocked, MockInstance } from 'vitest';
 import {
   MineTurDistrict,
+  MineTurFuel,
   MineTurHttpClient,
   MineTurMunicipality,
   MineTurRegion,
@@ -9,6 +10,7 @@ import { MineTurClient } from '../client';
 import {
   mapDistrictFiltersToMineTurDistrictFilters,
   mapMineTurDistrictsToDistricts,
+  mapMineTurFuelsToFuels,
   mapMineTurMunicipalitiesToMunicipalities,
   mapMineTurRegionsToRegions,
   mapMunicipalityFiltersToMineTurMunicipalityFilters,
@@ -16,6 +18,7 @@ import {
 import { DistrictFilters, MunicipalityFilters } from '../client.type';
 import {
   districtsFixture,
+  fuelsFixture,
   municipalitiesFixture,
   regionsFixture,
 } from './client.fixture';
@@ -31,6 +34,7 @@ vi.mock('../client.mapper', () => ({
   mapDistrictFiltersToMineTurDistrictFilters: vi.fn(),
   mapMineTurMunicipalitiesToMunicipalities: vi.fn(),
   mapMunicipalityFiltersToMineTurMunicipalityFilters: vi.fn(),
+  mapMineTurFuelsToFuels: vi.fn(),
 }));
 
 describe('MineTurClient', () => {
@@ -389,6 +393,117 @@ describe('MineTurClient', () => {
       expect(httpClientMock.getMunicipalities).toHaveBeenCalledTimes(2);
       expect(firstCall).toEqual([]);
       expect(secondCall).toEqual(municipalitiesFixture);
+    });
+  });
+
+  describe('getFuels', () => {
+    it('should return an array of fuels when the http-client request succeeds and provides outcome', async () => {
+      // Assemble
+      const mineTurFuels = [{
+        IDProducto: '1',
+        NombreProducto: 'Gasolina 95 E5',
+        NombreProductoAbreviatura: 'G95E5',
+      }] as MineTurFuel[];
+      httpClientMock.getFuels.mockResolvedValueOnce(mineTurFuels);
+
+      // Act
+      const fuels = await client.getFuels();
+
+      // Assert
+      expect(httpClientMock.getFuels).toHaveBeenCalledTimes(1);
+      expect(mapMineTurFuelsToFuels).toHaveBeenCalledWith(mineTurFuels);
+      expect(fuels).toEqual(fuelsFixture);
+    });
+
+    it('should return an empty array and log an error when the http-client request fails', async () => {
+      // Assemble
+      httpClientMock.getFuels.mockRejectedValueOnce(createError());
+
+      // Act
+      const fuels = await client.getFuels();
+
+      // Assert
+      expect(httpClientMock.getFuels).toHaveBeenCalledTimes(1);
+      expect(fuels).toEqual([]);
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to fetch fuels (Network error)');
+    });
+
+    it('should cache fuels and avoid subsequent network calls', async () => {
+      // Assemble
+      const mineTurFuels = [{
+        IDProducto: '1',
+        NombreProducto: 'Gasolina 95 E5',
+        NombreProductoAbreviatura: 'G95E5',
+      }] as MineTurFuel[];
+      httpClientMock.getFuels.mockResolvedValueOnce(mineTurFuels);
+
+      // Act
+      const firstCall = await client.getFuels();
+      const secondCall = await client.getFuels();
+
+      // Assert
+      expect(httpClientMock.getFuels).toHaveBeenCalledTimes(1);
+      expect(firstCall).toEqual(fuelsFixture);
+      expect(secondCall).toEqual(fuelsFixture);
+    });
+
+    it('should share the in-flight promise across concurrent calls', async () => {
+      // Assemble
+      const mineTurFuels = [{
+        IDProducto: '1',
+        NombreProducto: 'Gasolina 95 E5',
+        NombreProductoAbreviatura: 'G95E5',
+      }] as MineTurFuel[];
+      httpClientMock.getFuels.mockResolvedValueOnce(mineTurFuels);
+
+      // Act
+      const [firstCall, secondCall] = await Promise.all([
+        client.getFuels(),
+        client.getFuels(),
+      ]);
+
+      // Assert
+      expect(httpClientMock.getFuels).toHaveBeenCalledTimes(1);
+      expect(firstCall).toEqual(fuelsFixture);
+      expect(secondCall).toEqual(fuelsFixture);
+    });
+
+    it('should bypass cache when forceRefresh is true', async () => {
+      // Assemble
+      const mineTurFuels = [{
+        IDProducto: '1',
+        NombreProducto: 'Gasolina 95 E5',
+        NombreProductoAbreviatura: 'G95E5',
+      }] as MineTurFuel[];
+      httpClientMock.getFuels.mockResolvedValueOnce(mineTurFuels);
+
+      // Act
+      await client.getFuels();
+      await client.getFuels({ forceRefresh: true });
+
+      // Assert
+      expect(httpClientMock.getFuels).toHaveBeenCalledTimes(2);
+    });
+
+    it('should not cache when the request fails, allowing subsequent retry', async () => {
+      // Assemble
+      const mineTurFuels = [{
+        IDProducto: '1',
+        NombreProducto: 'Gasolina 95 E5',
+        NombreProductoAbreviatura: 'G95E5',
+      }] as MineTurFuel[];
+      httpClientMock.getFuels
+        .mockRejectedValueOnce(createError())
+        .mockResolvedValueOnce(mineTurFuels);
+
+      // Act
+      const firstCall = await client.getFuels();
+      const secondCall = await client.getFuels();
+
+      // Assert
+      expect(httpClientMock.getFuels).toHaveBeenCalledTimes(2);
+      expect(firstCall).toEqual([]);
+      expect(secondCall).toEqual(fuelsFixture);
     });
   });
 });

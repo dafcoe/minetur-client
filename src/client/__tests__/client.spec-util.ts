@@ -3,12 +3,14 @@ import { MineTurHttpClient } from '../../http-client';
 import {
   mapDistrictFiltersToMineTurDistrictFilters,
   mapMineTurDistrictsToDistricts,
+  mapMineTurFuelsToFuels,
   mapMineTurMunicipalitiesToMunicipalities,
   mapMineTurRegionsToRegions,
   mapMunicipalityFiltersToMineTurMunicipalityFilters,
 } from '../client.mapper';
 import {
   districtsFixture,
+  fuelsFixture,
   municipalitiesFixture,
   regionsFixture,
 } from './client.fixture';
@@ -22,6 +24,7 @@ export function createHttpClientMock() {
     getRegions: vi.fn(),
     getDistricts: vi.fn(),
     getMunicipalities: vi.fn(),
+    getFuels: vi.fn(),
   } as unknown as Mocked<MineTurHttpClient>;
 }
 
@@ -31,4 +34,5 @@ export function mockMappers() {
   vi.mocked(mapDistrictFiltersToMineTurDistrictFilters).mockReturnValue({});
   vi.mocked(mapMineTurMunicipalitiesToMunicipalities).mockReturnValue(municipalitiesFixture);
   vi.mocked(mapMunicipalityFiltersToMineTurMunicipalityFilters).mockReturnValue({});
+  vi.mocked(mapMineTurFuelsToFuels).mockReturnValue(fuelsFixture);
 }

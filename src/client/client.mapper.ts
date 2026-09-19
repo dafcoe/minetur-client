@@ -1,6 +1,7 @@
 import {
   MineTurDistrict,
   MineTurDistrictFilters,
+  MineTurFuel,
   MineTurMunicipality,
   MineTurMunicipalityFilters,
   MineTurRegion,
@@ -8,6 +9,7 @@ import {
 import {
   District,
   DistrictFilters,
+  Fuel,
   Municipality,
   MunicipalityFilters,
   Region,
@@ -71,4 +73,16 @@ export function mapMunicipalityFiltersToMineTurMunicipalityFilters(
   if (municipalityFilters.districtId) filters.IDPovincia = municipalityFilters.districtId;
 
   return filters;
+}
+
+export function mapMineTurFuelToFuel(mineTurFuel: MineTurFuel): Fuel {
+  return {
+    id: mineTurFuel.IDProducto,
+    name: mineTurFuel.NombreProducto,
+    abbreviation: mineTurFuel.NombreProductoAbreviatura,
+  };
+}
+
+export function mapMineTurFuelsToFuels(mineTurFuels: MineTurFuel[]): Fuel[] {
+  return mineTurFuels.map(mapMineTurFuelToFuel);
 }

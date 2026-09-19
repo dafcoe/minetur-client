@@ -2,6 +2,7 @@ import { MineTurHttpClient } from '../http-client';
 import {
   mapDistrictFiltersToMineTurDistrictFilters,
   mapMineTurDistrictsToDistricts,
+  mapMineTurFuelsToFuels,
   mapMineTurMunicipalitiesToMunicipalities,
   mapMineTurRegionsToRegions,
   mapMunicipalityFiltersToMineTurMunicipalityFilters,
@@ -10,6 +11,7 @@ import {
   District,
   DistrictFilters,
   FetchOptions,
+  Fuel,
   Municipality,
   MunicipalityFilters,
   Region,
@@ -19,6 +21,7 @@ export class MineTurClient {
   private regionsPromise: Promise<Region[]> | null = null;
   private districtsPromises = new Map<string | 'ALL', Promise<District[]>>();
   private municipalitiesPromises = new Map<string | 'ALL', Promise<Municipality[]>>();
+  private fuelsPromise: Promise<Fuel[]> | null = null;
 
   constructor(
     private readonly httpClient: MineTurHttpClient = new MineTurHttpClient(),
@@ -133,6 +136,21 @@ export class MineTurClient {
         return this.httpClient.getMunicipalities(mineTurFilters);
       },
       mapMineTurMunicipalitiesToMunicipalities,
+      options,
+    );
+  }
+
+  /**
+   * Fetches the complete list of available fuels.
+   * Results are cached in memory. Use `forceRefresh: true` to bypass cache.
+   */
+  async getFuels(options?: FetchOptions): Promise<Fuel[]> {
+    return this.fetchAndCache(
+      'fuels',
+      this.fuelsPromise,
+      (promise) => { this.fuelsPromise = promise; },
+      () => this.httpClient.getFuels(),
+      mapMineTurFuelsToFuels,
       options,
     );
   }

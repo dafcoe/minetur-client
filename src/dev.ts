@@ -28,28 +28,28 @@ async function run() {
 
   console.log('\n');
 
-//   const brands = await client.getBrands();
-//   console.log(`${brands.length} brands found:`, brands);
-//
-//   console.log('\n');
-//
-//   const stationTypes = await client.getStationTypes();
-//   console.log(`${stationTypes.length} station types found:`, stationTypes);
-//
-//   console.log('\n');
-//
-//   const fuels = await client.getFuels();
-//   console.log(`${fuels.length} fuels found:`, fuels);
-//
-//   console.log('\n');
-//
-//   const stations = await client.getStations();
-//   console.log(`${stations.length} stations found:`, stations);
-//
-//   console.log('\n');
-//
-//   const castroMarimStations = await client.getStations({ municipalityIds: [107] });
-//   console.log(`${castroMarimStations.length} stations found in Castro Marim:`, castroMarimStations);
+  //   const brands = await client.getBrands();
+  //   console.log(`${brands.length} brands found:`, brands);
+  //
+  //   console.log('\n');
+  //
+  //   const stationTypes = await client.getStationTypes();
+  //   console.log(`${stationTypes.length} station types found:`, stationTypes);
+  //
+  //   console.log('\n');
+
+  const fuels = await client.getFuels();
+  console.log(`${fuels.length} fuels found:`, fuels);
+
+  console.log('\n');
+  //
+  //   const stations = await client.getStations();
+  //   console.log(`${stations.length} stations found:`, stations);
+  //
+  //   console.log('\n');
+  //
+  //   const castroMarimStations = await client.getStations({ municipalityIds: [107] });
+  //   console.log(`${castroMarimStations.length} stations found in Castro Marim:`, castroMarimStations);
 }
 
 run();

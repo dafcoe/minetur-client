@@ -24,6 +24,12 @@ export interface Municipality {
   name: string;
 }
 
+export interface Fuel {
+  id: string;
+  name: string;
+  abbreviation: string;
+}
+
 export interface FetchOptions {
   forceRefresh?: boolean;
 }

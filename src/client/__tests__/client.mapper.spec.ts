@@ -1,6 +1,8 @@
 import {
   mineTurDistrictMadridFixture,
   mineTurDistrictsFixture,
+  mineTurFuelGasolinaFixture,
+  mineTurFuelsFixture,
   mineTurMunicipalitiesFixture,
   mineTurMunicipalityMadridFixture,
   mineTurRegionAndaluciaFixture,
@@ -10,6 +12,8 @@ import {
   mapDistrictFiltersToMineTurDistrictFilters,
   mapMineTurDistrictsToDistricts,
   mapMineTurDistrictToDistrict,
+  mapMineTurFuelsToFuels,
+  mapMineTurFuelToFuel,
   mapMineTurMunicipalitiesToMunicipalities,
   mapMineTurMunicipalityToMunicipality,
   mapMineTurRegionsToRegions,
@@ -19,6 +23,8 @@ import {
 import {
   districtMadridFixture,
   districtsFixture,
+  fuelGasolinaFixture,
+  fuelsFixture,
   municipalitiesFixture,
   municipalityMadridFixture,
   regionAndaluciaFixture,
@@ -101,6 +107,32 @@ describe('client.mapper', () => {
 
       // Assert
       expect(municipalities).toEqual([]);
+    });
+  });
+
+  describe('fuels', () => {
+    it('should correctly map a single MineTurFuel to Fuel', () => {
+      // Act
+      const fuel = mapMineTurFuelToFuel(mineTurFuelGasolinaFixture);
+
+      // Assert
+      expect(fuel).toEqual(fuelGasolinaFixture);
+    });
+
+    it('should correctly map an array of MineTurFuels to Fuels', () => {
+      // Act
+      const fuels = mapMineTurFuelsToFuels(mineTurFuelsFixture);
+
+      // Assert
+      expect(fuels).toEqual(fuelsFixture);
+    });
+
+    it('should return an empty array when mapping an empty array of fuels', () => {
+      // Act
+      const fuels = mapMineTurFuelsToFuels([]);
+
+      // Assert
+      expect(fuels).toEqual([]);
     });
   });
 

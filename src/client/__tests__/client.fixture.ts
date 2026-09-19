@@ -1,4 +1,4 @@
-import { District, Municipality, Region } from '../client.type';
+import { District, Fuel, Municipality, Region } from '../client.type';
 
 // ###############################################################
 // Regions
@@ -61,4 +61,25 @@ export const municipalityAlcobendasFixture: Municipality = {
 export const municipalitiesFixture: Municipality[] = [
   municipalityMadridFixture,
   municipalityAlcobendasFixture,
+];
+
+// ###############################################################
+// Fuels
+// ###############################################################
+
+export const fuelGasolinaFixture: Fuel = {
+  id: '1',
+  name: 'Gasolina 95 E5',
+  abbreviation: 'G95E5',
+};
+
+export const fuelGasoleoFixture: Fuel = {
+  id: '4',
+  name: 'Gasoleo A',
+  abbreviation: 'GOA',
+};
+
+export const fuelsFixture: Fuel[] = [
+  fuelGasolinaFixture,
+  fuelGasoleoFixture,
 ];

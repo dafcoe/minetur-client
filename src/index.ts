@@ -3,6 +3,7 @@ export type {
   Region,
   District,
   FetchOptions,
+  Fuel,
   Municipality,
   MunicipalityFilters,
 } from './client';
