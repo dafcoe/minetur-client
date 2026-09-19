@@ -10,6 +10,7 @@ import {
   mapStationFiltersToMineTurStationFilters,
 } from './client.mapper';
 import {
+  CacheResource,
   District,
   DistrictFilters,
   FetchOptions,
@@ -179,5 +180,16 @@ export class MineTurClient {
 
       return [];
     }
+  }
+
+  /**
+   * Clears in-memory cached data.
+   * Can clear all caches or a specific resource cache.
+   */
+  clearCache(resource?: CacheResource): void {
+    if (!resource || resource === 'regions') this.regionsPromise = null;
+    if (!resource || resource === 'districts') this.districtsPromises.clear();
+    if (!resource || resource === 'municipalities') this.municipalitiesPromises.clear();
+    if (!resource || resource === 'fuels') this.fuelsPromise = null;
   }
 }

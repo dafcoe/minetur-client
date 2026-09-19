@@ -580,4 +580,68 @@ describe('MineTurClient', () => {
       expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to fetch stations (Network error)');
     });
   });
+
+  describe('clearCache', () => {
+    it('should clear all caches when called without arguments', async () => {
+      // Assemble
+      httpClientMock.getRegions.mockResolvedValue([{ IDCCAA: '01', CCAA: 'Andalucia' }] as MineTurRegion[]);
+      httpClientMock.getDistricts.mockResolvedValue([{ IDPovincia: '28', Provincia: 'Madrid' }] as MineTurDistrict[]);
+      httpClientMock.getMunicipalities.mockResolvedValue([{ IDMunicipio: '4354', Municipio: 'Madrid' }] as MineTurMunicipality[]);
+      httpClientMock.getFuels.mockResolvedValue([{
+        IDProducto: '1',
+        NombreProducto: 'Gasolina 95 E5',
+        NombreProductoAbreviatura: 'G95E5',
+      }] as MineTurFuel[]);
+
+      await client.getRegions();
+      await client.getDistricts();
+      await client.getMunicipalities();
+      await client.getFuels();
+
+      // Act
+      client.clearCache();
+
+      await client.getRegions();
+      await client.getDistricts();
+      await client.getMunicipalities();
+      await client.getFuels();
+
+      // Assert
+      expect(httpClientMock.getRegions).toHaveBeenCalledTimes(2);
+      expect(httpClientMock.getDistricts).toHaveBeenCalledTimes(2);
+      expect(httpClientMock.getMunicipalities).toHaveBeenCalledTimes(2);
+      expect(httpClientMock.getFuels).toHaveBeenCalledTimes(2);
+    });
+
+    it('should only clear the specified resource cache when resource name is provided', async () => {
+      // Assemble
+      httpClientMock.getRegions.mockResolvedValue([{ IDCCAA: '01', CCAA: 'Andalucia' }] as MineTurRegion[]);
+      httpClientMock.getDistricts.mockResolvedValue([{ IDPovincia: '28', Provincia: 'Madrid' }] as MineTurDistrict[]);
+      httpClientMock.getMunicipalities.mockResolvedValue([{ IDMunicipio: '4354', Municipio: 'Madrid' }] as MineTurMunicipality[]);
+      httpClientMock.getFuels.mockResolvedValue([{
+        IDProducto: '1',
+        NombreProducto: 'Gasolina 95 E5',
+        NombreProductoAbreviatura: 'G95E5',
+      }] as MineTurFuel[]);
+
+      await client.getRegions();
+      await client.getDistricts();
+      await client.getMunicipalities();
+      await client.getFuels();
+
+      // Act
+      client.clearCache('districts');
+
+      await client.getRegions();
+      await client.getDistricts();
+      await client.getMunicipalities();
+      await client.getFuels();
+
+      // Assert
+      expect(httpClientMock.getRegions).toHaveBeenCalledTimes(1);
+      expect(httpClientMock.getDistricts).toHaveBeenCalledTimes(2);
+      expect(httpClientMock.getMunicipalities).toHaveBeenCalledTimes(1);
+      expect(httpClientMock.getFuels).toHaveBeenCalledTimes(1);
+    });
+  });
 });

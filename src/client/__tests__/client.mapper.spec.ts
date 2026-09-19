@@ -222,16 +222,20 @@ describe('client.mapper', () => {
         // Assemble
         const dateStringA = '';
         const dateStringB = 'invalid';
+        const dateStringC = '13/09/2026 invalid';
         const expectedTimestampA = 0;
         const expectedTimestampB = 0;
+        const expectedTimestampC = 0;
 
         // Act
         const timestampA = parseDateStringToTimestamp(dateStringA);
         const timestampB = parseDateStringToTimestamp(dateStringB);
+        const timestampC = parseDateStringToTimestamp(dateStringC);
 
         // Assert
         expect(timestampA).toBe(expectedTimestampA);
         expect(timestampB).toBe(expectedTimestampB);
+        expect(timestampC).toBe(expectedTimestampC);
       });
     });
 

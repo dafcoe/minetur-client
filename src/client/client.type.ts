@@ -67,3 +67,9 @@ export interface Station {
 export interface FetchOptions {
   forceRefresh?: boolean;
 }
+
+export type CacheResource =
+  | 'regions'
+  | 'districts'
+  | 'municipalities'
+  | 'fuels';
