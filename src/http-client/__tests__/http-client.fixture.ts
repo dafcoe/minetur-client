@@ -125,7 +125,7 @@ const mineTurStationEmptyPrices = {
   'Precio Metanol': '',
 };
 
-export const mineTurStationMadridFixture: MineTurStation = {
+export const mineTurStationAFixture: MineTurStation = {
   'C.P.': '28001',
   Dirección: 'CALLE ALCALÁ, 1',
   Horario: 'L-D: 07:00-22:00',
@@ -134,8 +134,8 @@ export const mineTurStationMadridFixture: MineTurStation = {
   'Longitud (WGS84)': '-3,703790',
   Margen: 'D',
   Municipio: 'Madrid',
-  'Precio Gasoleo A': '1,749',
-  'Precio Gasolina 95 E5': '1,849',
+  'Precio Gasoleo A': '1,699',
+  'Precio Gasolina 95 E5': '1,799',
   Provincia: 'MADRID',
   Remisión: 'dm',
   Rótulo: 'REPSOL',
@@ -149,7 +149,7 @@ export const mineTurStationMadridFixture: MineTurStation = {
   ...mineTurStationEmptyPrices,
 };
 
-export const mineTurStationAlcobendasFixture: MineTurStation = {
+export const mineTurStationBFixture: MineTurStation = {
   'C.P.': '28100',
   Dirección: 'AVENIDA DE LA CONSTITUCIÓN, 10',
   Horario: 'L-D: 06:00-23:00',
@@ -174,8 +174,8 @@ export const mineTurStationAlcobendasFixture: MineTurStation = {
 };
 
 export const mineTurStationsFixture: MineTurStation[] = [
-  mineTurStationMadridFixture,
-  mineTurStationAlcobendasFixture,
+  mineTurStationAFixture,
+  mineTurStationBFixture,
 ];
 
 export const mineTurStationsResponseFixture: MineTurStations = {

@@ -5,7 +5,9 @@ import {
   mapMineTurFuelsToFuels,
   mapMineTurMunicipalitiesToMunicipalities,
   mapMineTurRegionsToRegions,
+  mapMineTurStationsToStations,
   mapMunicipalityFiltersToMineTurMunicipalityFilters,
+  mapStationFiltersToMineTurStationFilters,
 } from './client.mapper';
 import {
   District,
@@ -15,6 +17,8 @@ import {
   Municipality,
   MunicipalityFilters,
   Region,
+  Station,
+  StationFilters,
 } from './client.type';
 
 export class MineTurClient {
@@ -153,5 +157,27 @@ export class MineTurClient {
       mapMineTurFuelsToFuels,
       options,
     );
+  }
+
+  /**
+   * Fetches stations and their fuel prices using optional filters.
+   */
+  async getStations(filters: StationFilters = {}): Promise<Station[]> {
+    try {
+      const mineTurFilters = mapStationFiltersToMineTurStationFilters(filters);
+
+      const [response, fuels] = await Promise.all([
+        this.httpClient.getStations(mineTurFilters),
+        this.getFuels(),
+      ]);
+
+      if (!response?.ListaEESSPrecio) return [];
+
+      return mapMineTurStationsToStations(response, fuels);
+    } catch (error) {
+      this.logFetchError('stations', error);
+
+      return [];
+    }
   }
 }

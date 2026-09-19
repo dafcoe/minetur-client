@@ -5,7 +5,9 @@ import {
   MineTurHttpClient,
   MineTurMunicipality,
   MineTurRegion,
+  MineTurStations,
 } from '../../http-client';
+import { mineTurStationsResponseFixture } from '../../http-client/__tests__/http-client.fixture';
 import { MineTurClient } from '../client';
 import {
   mapDistrictFiltersToMineTurDistrictFilters,
@@ -13,14 +15,21 @@ import {
   mapMineTurFuelsToFuels,
   mapMineTurMunicipalitiesToMunicipalities,
   mapMineTurRegionsToRegions,
+  mapMineTurStationsToStations,
   mapMunicipalityFiltersToMineTurMunicipalityFilters,
+  mapStationFiltersToMineTurStationFilters,
 } from '../client.mapper';
-import { DistrictFilters, MunicipalityFilters } from '../client.type';
+import {
+  DistrictFilters,
+  MunicipalityFilters,
+  StationFilters,
+} from '../client.type';
 import {
   districtsFixture,
   fuelsFixture,
   municipalitiesFixture,
   regionsFixture,
+  stationsFixture,
 } from './client.fixture';
 import {
   createError,
@@ -35,6 +44,8 @@ vi.mock('../client.mapper', () => ({
   mapMineTurMunicipalitiesToMunicipalities: vi.fn(),
   mapMunicipalityFiltersToMineTurMunicipalityFilters: vi.fn(),
   mapMineTurFuelsToFuels: vi.fn(),
+  mapMineTurStationsToStations: vi.fn(),
+  mapStationFiltersToMineTurStationFilters: vi.fn(),
 }));
 
 describe('MineTurClient', () => {
@@ -504,6 +515,69 @@ describe('MineTurClient', () => {
       expect(httpClientMock.getFuels).toHaveBeenCalledTimes(2);
       expect(firstCall).toEqual([]);
       expect(secondCall).toEqual(fuelsFixture);
+    });
+  });
+
+  describe('getStations', () => {
+    it('should return an array of stations when the http-client request succeeds (without filters)', async () => {
+      // Assemble
+      httpClientMock.getStations.mockResolvedValueOnce(mineTurStationsResponseFixture);
+      httpClientMock.getFuels.mockResolvedValueOnce([]);
+
+      // Act
+      const stations = await client.getStations();
+
+      // Assert
+      expect(httpClientMock.getStations).toHaveBeenCalledTimes(1);
+      expect(httpClientMock.getStations).toHaveBeenCalledWith({});
+      expect(mapMineTurStationsToStations).toHaveBeenCalledWith(mineTurStationsResponseFixture, fuelsFixture);
+      expect(stations).toEqual(stationsFixture);
+    });
+
+    it('should return an array of stations when the http-client request succeeds (with filters)', async () => {
+      // Assemble
+      const filters: StationFilters = { districtId: '28', fuelId: '1' };
+      const expectedMineTurFilters = { IDProvincia: '28', IDProducto: '1' };
+      vi.mocked(mapStationFiltersToMineTurStationFilters).mockReturnValueOnce(expectedMineTurFilters);
+      httpClientMock.getStations.mockResolvedValueOnce(mineTurStationsResponseFixture);
+      httpClientMock.getFuels.mockResolvedValueOnce([]);
+
+      // Act
+      const stations = await client.getStations(filters);
+
+      // Assert
+      expect(mapStationFiltersToMineTurStationFilters).toHaveBeenCalledWith(filters);
+      expect(httpClientMock.getStations).toHaveBeenCalledTimes(1);
+      expect(httpClientMock.getStations).toHaveBeenCalledWith(expectedMineTurFilters);
+      expect(mapMineTurStationsToStations).toHaveBeenCalledWith(mineTurStationsResponseFixture, fuelsFixture);
+      expect(stations).toEqual(stationsFixture);
+    });
+
+    it('should return an empty array when response has no ListaEESSPrecio', async () => {
+      // Assemble
+      httpClientMock.getStations.mockResolvedValueOnce({} as MineTurStations);
+      httpClientMock.getFuels.mockResolvedValueOnce([]);
+
+      // Act
+      const stations = await client.getStations();
+
+      // Assert
+      expect(httpClientMock.getStations).toHaveBeenCalledTimes(1);
+      expect(stations).toEqual([]);
+    });
+
+    it('should return an empty array and log an error when the http-client request fails', async () => {
+      // Assemble
+      httpClientMock.getStations.mockRejectedValueOnce(createError());
+      httpClientMock.getFuels.mockResolvedValueOnce([]);
+
+      // Act
+      const stations = await client.getStations();
+
+      // Assert
+      expect(httpClientMock.getStations).toHaveBeenCalledTimes(1);
+      expect(stations).toEqual([]);
+      expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to fetch stations (Network error)');
     });
   });
 });

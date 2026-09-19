@@ -6,4 +6,7 @@ export type {
   Fuel,
   Municipality,
   MunicipalityFilters,
+  Station,
+  StationFilters,
+  StationFuel,
 } from './client';
