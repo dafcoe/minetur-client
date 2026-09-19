@@ -1,8 +1,11 @@
-// import { DGEGClient } from './index';
-//
-// async function run() {
-//   const client = new DGEGClient();
-//
+import { MineTurClient } from './client/client';
+
+async function run() {
+  const client = new MineTurClient();
+
+  const regions = await client.getRegions();
+  console.log(`${regions.length} regions found:`, regions);
+
 //   const districts = await client.getDistricts();
 //   console.log(`${districts.length} districts found:`, districts);
 //
@@ -40,6 +43,6 @@
 //
 //   const castroMarimStations = await client.getStations({ municipalityIds: [107] });
 //   console.log(`${castroMarimStations.length} stations found in Castro Marim:`, castroMarimStations);
-// }
-//
-// run();
+}
+
+run();
