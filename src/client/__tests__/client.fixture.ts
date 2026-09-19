@@ -1,4 +1,4 @@
-import { Region } from '../client.type';
+import { District, Region } from '../client.type';
 
 // ###############################################################
 // Regions
@@ -17,4 +17,25 @@ export const regionMadridFixture: Region = {
 export const regionsFixture: Region[] = [
   regionAndaluciaFixture,
   regionMadridFixture,
+];
+
+// ###############################################################
+// Districts
+// ###############################################################
+
+export const districtMadridFixture: District = {
+  id: '28',
+  idRegion: '13',
+  name: 'Madrid',
+};
+
+export const districtSevillaFixture: District = {
+  id: '41',
+  idRegion: '01',
+  name: 'Sevilla',
+};
+
+export const districtsFixture: District[] = [
+  districtMadridFixture,
+  districtSevillaFixture,
 ];

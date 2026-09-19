@@ -1,9 +1,19 @@
 import { MineTurHttpClient } from '../http-client';
-import { mapMineTurRegionsToRegions } from './client.mapper';
-import { FetchOptions, Region } from './client.type';
+import {
+  mapDistrictFiltersToMineTurDistrictFilters,
+  mapMineTurDistrictsToDistricts,
+  mapMineTurRegionsToRegions,
+} from './client.mapper';
+import {
+  District,
+  DistrictFilters,
+  FetchOptions,
+  Region,
+} from './client.type';
 
 export class MineTurClient {
   private regionsPromise: Promise<Region[]> | null = null;
+  private districtsPromises = new Map<string | 'ALL', Promise<District[]>>();
 
   constructor(
     private readonly httpClient: MineTurHttpClient = new MineTurHttpClient(),
@@ -64,6 +74,33 @@ export class MineTurClient {
       (promise) => { this.regionsPromise = promise; },
       () => this.httpClient.getRegions(),
       mapMineTurRegionsToRegions,
+      options,
+    );
+  }
+
+  /**
+   * Fetches districts, optionally filtered by region ID.
+   * Results are cached in memory. Use `forceRefresh: true` to bypass cache.
+   */
+  async getDistricts(
+    filters: DistrictFilters = {},
+    options?: FetchOptions,
+  ): Promise<District[]> {
+    const cacheKey = filters.regionId ?? 'ALL';
+    const currentPromise = this.districtsPromises.get(cacheKey) ?? null;
+
+    return this.fetchAndCache(
+      'districts',
+      currentPromise,
+      (promise) => {
+        if (promise) this.districtsPromises.set(cacheKey, promise);
+        else this.districtsPromises.delete(cacheKey);
+      },
+      () => {
+        const mineTurFilters = mapDistrictFiltersToMineTurDistrictFilters(filters);
+        return this.httpClient.getDistricts(mineTurFilters);
+      },
+      mapMineTurDistrictsToDistricts,
       options,
     );
   }

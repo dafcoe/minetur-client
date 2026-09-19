@@ -6,11 +6,16 @@ async function run() {
   const regions = await client.getRegions();
   console.log(`${regions.length} regions found:`, regions);
 
-//   const districts = await client.getDistricts();
-//   console.log(`${districts.length} districts found:`, districts);
-//
-//   console.log('\n');
-//
+  const districts = await client.getDistricts();
+  console.log(`${districts.length} districts found:`, districts);
+
+  console.log('\n');
+
+  const andaluziaDistricts = await client.getDistricts({ regionId: '01' });
+  console.log(`${andaluziaDistricts.length} districts found on Andaluzia:`, andaluziaDistricts);
+
+  console.log('\n');
+
 //   const municipalities = await client.getMunicipalities();
 //   console.log(`${municipalities.length} municipalities found:`, municipalities);
 //

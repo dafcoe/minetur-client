@@ -1,7 +1,11 @@
 import { Mocked } from 'vitest';
 import { MineTurHttpClient } from '../../http-client';
-import { mapMineTurRegionsToRegions } from '../client.mapper';
-import { regionsFixture } from './client.fixture';
+import {
+  mapDistrictFiltersToMineTurDistrictFilters,
+  mapMineTurDistrictsToDistricts,
+  mapMineTurRegionsToRegions,
+} from '../client.mapper';
+import { districtsFixture, regionsFixture } from './client.fixture';
 
 export function createError(message = 'Network error'): Error {
   return new Error(message);
@@ -10,9 +14,12 @@ export function createError(message = 'Network error'): Error {
 export function createHttpClientMock() {
   return {
     getRegions: vi.fn(),
+    getDistricts: vi.fn(),
   } as unknown as Mocked<MineTurHttpClient>;
 }
 
 export function mockMappers() {
   vi.mocked(mapMineTurRegionsToRegions).mockReturnValue(regionsFixture);
+  vi.mocked(mapMineTurDistrictsToDistricts).mockReturnValue(districtsFixture);
+  vi.mocked(mapDistrictFiltersToMineTurDistrictFilters).mockReturnValue({});
 }
